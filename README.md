@@ -20,3 +20,19 @@ System
 Turret
 - Seek for Monster
 - Fire energyBall
+
+2017-12-04
+
+System
+- Now Check Game Ends
+  It counts the remaining Monster Objects and castle HP
+  game ends if castle's hp <=0 or remaining Monster number == 0
+  system stops spawning monsters and monsters stop moving
+
+- Gold system
+  gold is accumulated certain amount at regular time
+  if monster dies, gold increases
+  certain amount of gold is needed to summon turret
+
+UI
+- show current gold and remaining monster number
