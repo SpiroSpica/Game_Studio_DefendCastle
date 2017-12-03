@@ -11,12 +11,19 @@ public class MonsterCtrl : MonoBehaviour {
 
     Vector3 goal;
     Vector3 respawn;
-    NavMeshAgent agent;
-    GameObject castle;
+    private NavMeshAgent agent;
+
+    [SerializeField]
+    private int cost;
+    private GameObject sys; //access to gamectrl
+
+    [SerializeField]
+    private GameObject castle;
 
 	// Use this for initialization
 	void Start () {
-        castle = GameObject.FindWithTag("Castle");
+        //castle = GameObject.FindWithTag("Castle");
+        sys = GameObject.Find("Main Camera");
         goal = castle.transform.position;
         respawn = transform.position;
         agent = GetComponent<NavMeshAgent>();
@@ -43,6 +50,7 @@ public class MonsterCtrl : MonoBehaviour {
         {
             //개수 감소를 처리하고, 골드를 준다. 그 후 게임 오브젝트를 삭제시킨다.
             Debug.Log("Monster has destroyed by low hp");
+            sys.SendMessage("earnMoney", cost);
             Destroy(this.gameObject);
         }
         if(transform.position.y <=- 50) // 추락 버그 방지
@@ -50,5 +58,6 @@ public class MonsterCtrl : MonoBehaviour {
             Debug.Log("Monster has destroyed by position error");
             Destroy(gameObject); 
         }
+        //agent.speed = speed;
 	}
 }

@@ -2,33 +2,57 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.AI;
 
 public class GameCtrl : MonoBehaviour {
 
+    [SerializeField]
     public int num;
+    [SerializeField]
     public int resTime;
+    [SerializeField]
     public int amount;
+    [SerializeField]
     public GameObject Mons;
-    //public GameObject Effect;
-    //public GameObject Turret;
-    //public Button bt1; //현재 클릭 인식 자체가 안되는 문제가 있다.
+    [SerializeField]
+    public GameObject Turret;
+    public int cost;
+    [SerializeField]
+    public Button bt1;
+    [SerializeField]
+    public GameObject Castle;
+    public bool gameEnd = false;
+
+    
+    [SerializeField]
+    private GameObject Effect;
+    [SerializeField]
+    private int gold = 0;
 
     private Vector3 pos;
     private Quaternion rot;
-    //private bool SummonFlag;
-    private bool gameEnd = false;
-
+    private bool SummonFlag;
+    private NavMeshAgent tmpNav;
     GameObject IC;
     Vector3 newPosition;
-
     RaycastHit hit;
+    private GameObject txt;
+    private Text info;
     int layerNum = 1 << 8;
+
     void Start () {
-        InvokeRepeating("FinishCheck", 5, 5);
+        InvokeRepeating("FinishCheck", 1, 1);
+        InvokeRepeating("GainMoney", 1, 3);
         InvokeRepeating("SummonMons", 1, resTime);
-    //    bt1.onClick.AddListener(TaskOnClick);
+        bt1.onClick.AddListener(TaskOnClick);
+        txt = GameObject.Find("Canvas/Information");
+        info = txt.GetComponent<Text>();
     }
 	
+    private void GainMoney()
+    {
+        gold += amount;
+    }
     private void SummonMons()
     {
         num--;
@@ -47,7 +71,6 @@ public class GameCtrl : MonoBehaviour {
             Instantiate(Mons, pos, rot);
         }
     }
-
     private void FinishCheck()
     {
         GameObject[] gos;
@@ -56,28 +79,31 @@ public class GameCtrl : MonoBehaviour {
             gameEnd = true;
         if (gameEnd == true)
         {
+            for(int i=0; i<gos.Length; i++)
+            {
+                Debug.Log("Stop Them!");
+                tmpNav = gos[i].GetComponent<NavMeshAgent>();
+                tmpNav.speed = 0;
+            }
             Debug.Log("Game has ended");
             CancelInvoke("SummonMons");
         }
     }
-
     void TaskOnClick()
     {
         Debug.Log("Clicked");
-        /*
-        //if (game.money < cost)
-        //    Debug.Log("You don't have enought Money");
-        //else
-        //{
+
+        if (gold < cost)
+            Debug.Log("You don't have enough Money");
+        else
+        {
             IC = GameObject.Instantiate(Turret, newPosition, new Quaternion(0, 0, 0, 0)) as GameObject;
+            Debug.Log("Summon");
             SummonFlag = true;
-            //game.SendMessage("MoneyUse", cost);
+            gold -= cost;
+        }
         
-        */
     }
-
-
-    
     void CameraMove()
     {
         if (Input.GetKey("w"))
@@ -111,12 +137,40 @@ public class GameCtrl : MonoBehaviour {
                 this.transform.position += new Vector3(0, -1, 0);
         }
     }
-    
-    
+    void TurretSum()
+    {
+        if (SummonFlag == true)
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            {
 
+                if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerNum) && hit.point.x >= 0 && hit.point.z >= 0)
+                {
+                    newPosition = hit.point;
+                    newPosition.y += 3;
+                    if (hit.point.y <= 500)
+                    {
+                        IC.transform.position = newPosition;
+                    }
+                }
+
+            }
+        }
+        if (SummonFlag == true && Input.GetMouseButton(0))
+        {
+            Instantiate(Effect, newPosition - new Vector3(0, 2.0f, 0), new Quaternion(0, 0, 0, 0));
+            SummonFlag = false;
+            IC.SendMessage("active");
+        }
+    }
+    void earnMoney(int a)
+    {
+        gold += a;
+    }
 	// Update is called once per frame
 	void Update () {
         CameraMove();
-        //TurretSum();
+        TurretSum();
+        info.text = "Gold : " + gold + "\n" + "Number of Enemies Left : " + num;
     }
 }

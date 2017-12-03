@@ -8,10 +8,14 @@ public class CastleCtrl : MonoBehaviour {
     public int breakPoint;
     // Use this for initialization
     private int initHP;
+    private int breakFlag = 1;
+    private GameObject sys;
     Rigidbody rigid;
+    GameCtrl gc;
 	void Start () {
         initHP = HP;
         rigid = GetComponent<Rigidbody>();
+        sys = GameObject.Find("Main Camera");
 	}
 
     void OnTriggerEnter(Collider other)
@@ -39,13 +43,16 @@ public class CastleCtrl : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        if(HP <= initHP/2)
+        if(HP <= initHP/2 && breakFlag == 1)
         {
             BreakDown();
+            breakFlag = 0;
         }
 		if(HP <= 0)
         {
             rigid.constraints &= ~RigidbodyConstraints.FreezePositionY;
+            gc = sys.GetComponent<GameCtrl>();
+            gc.gameEnd = true;
         }
 	}
 }
