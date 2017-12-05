@@ -58,6 +58,6 @@ public class MonsterCtrl : MonoBehaviour {
             Debug.Log("Monster has destroyed by position error");
             Destroy(gameObject); 
         }
-        //agent.speed = speed;
+        //dagent.speed = speed;
 	}
 }

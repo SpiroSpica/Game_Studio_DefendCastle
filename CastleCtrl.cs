@@ -41,6 +41,11 @@ public class CastleCtrl : MonoBehaviour {
         }
     }
 
+    void Des()
+    {
+        Destroy(this.gameObject);
+    }
+
     // Update is called once per frame
     void Update () {
         if(HP <= initHP/2 && breakFlag == 1)
@@ -53,6 +58,7 @@ public class CastleCtrl : MonoBehaviour {
             rigid.constraints &= ~RigidbodyConstraints.FreezePositionY;
             gc = sys.GetComponent<GameCtrl>();
             gc.gameEnd = true;
+            Invoke("Des", 3);
         }
 	}
 }

@@ -7,20 +7,27 @@ using UnityEngine.AI;
 public class GameCtrl : MonoBehaviour {
 
     [SerializeField]
-    public int num;
+    private int num;
     [SerializeField]
-    public int resTime;
+    private int num2;
     [SerializeField]
-    public int amount;
+    private int resTime;
     [SerializeField]
-    public GameObject Mons;
+    private int resTime2;
     [SerializeField]
-    public GameObject Turret;
+    private int amount;
+    [SerializeField]
+    private GameObject Mons;
+    [SerializeField]
+    private GameObject Mons2;
+
+    [SerializeField]
+    private GameObject Turret;
     public int cost;
     [SerializeField]
-    public Button bt1;
+    private Button bt1;
     [SerializeField]
-    public GameObject Castle;
+    private GameObject Castle;
     public bool gameEnd = false;
 
     
@@ -33,30 +40,37 @@ public class GameCtrl : MonoBehaviour {
     private Quaternion rot;
     private bool SummonFlag;
     private NavMeshAgent tmpNav;
+    private int timeMoney = 3;
     GameObject IC;
     Vector3 newPosition;
     RaycastHit hit;
     private GameObject txt;
     private Text info;
+    private int numTot;
     int layerNum = 1 << 8;
 
     void Start () {
-        InvokeRepeating("FinishCheck", 1, 1);
-        InvokeRepeating("GainMoney", 1, 3);
-        InvokeRepeating("SummonMons", 1, resTime);
+        InvokeRepeating("FinishCheck", 5, 1);
+        StartCoroutine(GainMoney(amount, timeMoney));// InvokeRepeating("GainMoney", 1, 3);
+        StartCoroutine(SummonMons(resTime,Mons,num));
+        StartCoroutine(SummonMons(resTime, Mons2, num2));
         bt1.onClick.AddListener(TaskOnClick);
         txt = GameObject.Find("Canvas/Information");
         info = txt.GetComponent<Text>();
+        numTot = num + num2;
     }
 	
-    private void GainMoney()
+    private IEnumerator GainMoney(int amount, int timeMoney)
     {
-        gold += amount;
+        while (!gameEnd)
+        {
+            gold += amount;
+            yield return new WaitForSeconds(timeMoney);
+        }
     }
-    private void SummonMons()
+    private IEnumerator SummonMons(int resTime, GameObject Mons, int numMons)
     {
-        num--;
-        if (num >= 0)
+        while(!gameEnd && numMons>=0)
         {
             int x, z;
             while (true)
@@ -69,6 +83,9 @@ public class GameCtrl : MonoBehaviour {
             pos = new Vector3(x, 133, z); //133은 terrain의 위치이다.
             rot = new Quaternion(0, 0, 0, 0);
             Instantiate(Mons, pos, rot);
+            yield return new WaitForSeconds(resTime);
+            numMons--;
+            numTot--;
         }
     }
     private void FinishCheck()
@@ -171,6 +188,6 @@ public class GameCtrl : MonoBehaviour {
 	void Update () {
         CameraMove();
         TurretSum();
-        info.text = "Gold : " + gold + "\n" + "Number of Enemies Left : " + num;
+        info.text = "Gold : " + gold + "\n" + "Number of Enemies Left : " + numTot;
     }
 }
