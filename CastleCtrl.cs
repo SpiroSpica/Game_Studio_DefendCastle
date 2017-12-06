@@ -4,21 +4,21 @@ using UnityEngine;
 
 public class CastleCtrl : MonoBehaviour {
 
-    public int HP;
-    public int breakPoint;
+    public int HP; //hp of the castle. breakdown at it's 50%, die at it's 0%
+    
     // Use this for initialization
     private int initHP;
     private int breakFlag = 1;
     private GameObject sys;
-    Rigidbody rigid;
-    GameCtrl gc;
+    Rigidbody rigid; //for the gameEnd situation -> make turret to falldown
+    GameCtrl gc; //get script information GameCtrl
 	void Start () {
         initHP = HP;
         rigid = GetComponent<Rigidbody>();
         sys = GameObject.Find("Main Camera");
 	}
 
-    void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other) //if collided by Monster, get damage that monster has, make monster's hp to 0 to destroy it
     {
         if(other.gameObject.CompareTag("Monster"))
         {
@@ -29,7 +29,7 @@ public class CastleCtrl : MonoBehaviour {
         }
     }
 
-    void BreakDown()
+    void BreakDown()  //add rigidbody to inner parts, lead parts to have collisions and explode.
     {
         int childNum = this.transform.childCount;
         for (int i = 0; i < childNum; i++)
@@ -41,19 +41,19 @@ public class CastleCtrl : MonoBehaviour {
         }
     }
 
-    void Des()
+    void Des()  //destroy
     {
         Destroy(this.gameObject);
     }
 
     // Update is called once per frame
     void Update () {
-        if(HP <= initHP/2 && breakFlag == 1)
+        if(HP <= initHP/2 && breakFlag == 1) //breakdown condition
         {
             BreakDown();
             breakFlag = 0;
         }
-		if(HP <= 0)
+		if(HP <= 0) //dead condition
         {
             rigid.constraints &= ~RigidbodyConstraints.FreezePositionY;
             gc = sys.GetComponent<GameCtrl>();

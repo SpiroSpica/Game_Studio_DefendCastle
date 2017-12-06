@@ -6,20 +6,19 @@ using UnityEngine;
 public class TurretCtrl : MonoBehaviour {
 
     // Use this for initialization
-    public GameObject proj;
-    public int dmg;
-    public float delay;
-    public float range;
-    public float disappear;
+    public GameObject proj; //shoot GameObject
+    public int dmg;  //damage that will be given to mosnter. if projectile is initated, this value is given to the projectile
+    public float delay; //delay for each shooting
+    public float range; //range that turret recognizes
+    public float disappear; //this is the life span of turret. if it is 10, turret disappears after 10 seconds
 
-    private GameObject IC;
-    private bool act = false;
+    private GameObject IC; //To access to projectile 
+    private bool act = false; //if this is false, nothing works. only works when true
 
     GameObject[] InRange = new GameObject[50];
 
 
     void Start () {
-        Debug.Log("Hi");
         InvokeRepeating("shoot",0,delay);
         
 	}

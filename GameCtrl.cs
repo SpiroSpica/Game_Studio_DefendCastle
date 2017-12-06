@@ -4,71 +4,82 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
 
+//You better change the instantiating monster in to array!!!!
+
 public class GameCtrl : MonoBehaviour {
 
+
+    public GameObject[] tes;
     [SerializeField]
-    private int num;
+    private int num; //number of monster1 to summon
     [SerializeField]
-    private int num2;
+    private int num2; //number of monster2 to summon
     [SerializeField]
-    private int resTime;
+    private int resTime; //set the respawn delay time. if its 3, mons 1 is summoned every 3 seconds
     [SerializeField]
-    private int resTime2;
+    private int resTime2; //same respawn delay but for mons2
     [SerializeField]
-    private int amount;
+    private int amount; // amount of money to increase per each period of time
+
+    private int timeMoney = 3; //period of time to gain money. If it is 3, player earns certain amount of money every 3 seconds
     [SerializeField]
-    private GameObject Mons;
+    private GameObject Mons; // GameObject to summon 
     [SerializeField]
-    private GameObject Mons2;
+    private GameObject Mons2; //GameObejct to summon
 
     [SerializeField]
-    private GameObject Turret;
-    public int cost;
+    private GameObject Turret; //GameObejct to build turret
+    public int cost; //cost that is needed to build turret 
     [SerializeField]
-    private Button bt1;
+    private Button bt1; //bt1 is to summon turret 1
     [SerializeField]
-    private GameObject Castle;
-    public bool gameEnd = false;
+    private GameObject Castle; //to get the value of castle. 
+    public bool gameEnd = false;  //check if system needs to continue the game or finish the game (It does not check win or lose yet)
 
     
     [SerializeField]
-    private GameObject Effect;
+    private GameObject Effect; // Effect instantiated by building turret 1  (May need to include exit effect also
     [SerializeField]
-    private int gold = 0;
+    private int gold = 0; //current gold amount. increase when time passes and get monster, loses when building turret or (using skills which has not made yet)
 
-    private Vector3 pos;
-    private Quaternion rot;
-    private bool SummonFlag;
-    private NavMeshAgent tmpNav;
-    private int timeMoney = 3;
-    GameObject IC;
-    Vector3 newPosition;
-    RaycastHit hit;
-    private GameObject txt;
-    private Text info;
-    private int numTot;
-    int layerNum = 1 << 8;
+    //below are about summoning turret
+    private Vector3 pos; //position of turret 
+    private Quaternion rot; //rotation of turret
+    private bool SummonFlag; //when this is enabled, turret follows the mouse movment. If not, turret fixes its position to where mouse is.
+    private NavMeshAgent tmpNav; //Make speed to 0 when game is finished -> make all monsters stop moving
 
-    void Start () {
-        InvokeRepeating("FinishCheck", 5, 1);
-        StartCoroutine(GainMoney(amount, timeMoney));// InvokeRepeating("GainMoney", 1, 3);
-        StartCoroutine(SummonMons(resTime,Mons,num));
-        StartCoroutine(SummonMons(resTime, Mons2, num2));
-        bt1.onClick.AddListener(TaskOnClick);
-        txt = GameObject.Find("Canvas/Information");
-        info = txt.GetComponent<Text>();
-        numTot = num + num2;
+
+    
+    GameObject IC;  //It is to access the value of instanatiated GameObject
+    Vector3 newPosition; //It is the position where mouse pointer is. Followed by using raycast
+    RaycastHit hit;  //hit point to get the newPosition above
+
+    //These are for the UI information
+    private GameObject txt; //to access the UI text
+    private Text info; // change the value saved in the text
+    private int numTot; //show he total monsters left.
+    int layerNum = 1 << 8; //This is for turret build. Make turret to only think about terrain layer
+
+    void Start () { //Initiate
+        InvokeRepeating("FinishCheck", 5, 1); //Finsih check is held after 5 seconds game starts and continues to check every 1 seoncd. Since it seeks for every monster object, it is avoided to use at update
+        StartCoroutine(GainMoney(amount, timeMoney)); //Gain ceratin amount of money at period of time
+        StartCoroutine(SummonMons(resTime,Mons,num)); //summon mons1 every resTime by num1
+        StartCoroutine(SummonMons(resTime, Mons2, num2)); //summon mons2 every resTIme2 by num2
+        bt1.onClick.AddListener(TaskOnClick); // bt1 listening
+        txt = GameObject.Find("Canvas/Information");  //access to UI text information
+        info = txt.GetComponent<Text>(); //aaccess to text itself
+        numTot = num + num2; //get the number of total mons
     }
 	
-    private IEnumerator GainMoney(int amount, int timeMoney)
+    private IEnumerator GainMoney(int amount, int timeMoney)  //increase amount at gold every timeMoney seconds
     {
-        while (!gameEnd)
+        while (!gameEnd)  //stop giving money when game ends
         {
             gold += amount;
             yield return new WaitForSeconds(timeMoney);
         }
     }
-    private IEnumerator SummonMons(int resTime, GameObject Mons, int numMons)
+    private IEnumerator SummonMons(int resTime, GameObject Mons, int numMons) //summon numMons of Mons by summoning a Mons every resTime
     {
         while(!gameEnd && numMons>=0)
         {
@@ -88,7 +99,7 @@ public class GameCtrl : MonoBehaviour {
             numTot--;
         }
     }
-    private void FinishCheck()
+    private void FinishCheck()  //Find Monster Objects with tag. If its number is 0, make gameEnd to true. As this function only sees gameEnd variable, if this value is changed by other function, it still works as gameEnd
     {
         GameObject[] gos;
         gos = GameObject.FindGameObjectsWithTag("Monster");
@@ -96,7 +107,7 @@ public class GameCtrl : MonoBehaviour {
             gameEnd = true;
         if (gameEnd == true)
         {
-            for(int i=0; i<gos.Length; i++)
+            for(int i=0; i<gos.Length; i++)  //If monsters are left, make them stop moving
             {
                 Debug.Log("Stop Them!");
                 tmpNav = gos[i].GetComponent<NavMeshAgent>();
@@ -106,11 +117,12 @@ public class GameCtrl : MonoBehaviour {
             CancelInvoke("SummonMons");
         }
     }
-    void TaskOnClick()
+    void TaskOnClick() //works when Clciked
     {
         Debug.Log("Clicked");
-
-        if (gold < cost)
+       
+        //If there's enough gold, summon turret
+        if (gold < cost) 
             Debug.Log("You don't have enough Money");
         else
         {
@@ -121,7 +133,7 @@ public class GameCtrl : MonoBehaviour {
         }
         
     }
-    void CameraMove()
+    void CameraMove()  //Camera movment left, right, front, back, up, down
     {
         if (Input.GetKey("w"))
         {
@@ -154,17 +166,17 @@ public class GameCtrl : MonoBehaviour {
                 this.transform.position += new Vector3(0, -1, 0);
         }
     }
-    void TurretSum()
+    void TurretSum()  //Turret summon -> if not clicked, move turret around. If clicked, set turret position
     {
         if (SummonFlag == true)
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); //shoot ray to the screen
             {
 
-                if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerNum) && hit.point.x >= 0 && hit.point.z >= 0)
+                if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerNum) && hit.point.x >= 0 && hit.point.z >= 0) //this lay only stops when collided by the object with terrain layer
                 {
                     newPosition = hit.point;
-                    newPosition.y += 3;
+                    newPosition.y += 3; //set the position. To avoid turrets from falling down.
                     if (hit.point.y <= 500)
                     {
                         IC.transform.position = newPosition;
@@ -173,14 +185,14 @@ public class GameCtrl : MonoBehaviour {
 
             }
         }
-        if (SummonFlag == true && Input.GetMouseButton(0))
+        if (SummonFlag == true && Input.GetMouseButton(0)) //if clicked
         {
             Instantiate(Effect, newPosition - new Vector3(0, 2.0f, 0), new Quaternion(0, 0, 0, 0));
             SummonFlag = false;
             IC.SendMessage("active");
         }
     }
-    void earnMoney(int a)
+    void earnMoney(int a)  // this is active when another way of gold earning happens. currently it is only used when monster dies
     {
         gold += a;
     }

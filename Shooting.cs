@@ -12,13 +12,13 @@ public class Shooting : MonoBehaviour {
 		
 	}
 	
-    void getTarget(GameObject tar)
+    void getTarget(GameObject tar) //set target
     {
         target = tar;
     }
 
 	// Update is called once per frame
-	void Update () {
+	void Update () { //move toward the target
         float step = speed * Time.deltaTime;
         if (target == null)
             Destroy(this.gameObject);
