@@ -36,3 +36,16 @@ System
 
 UI
 - show current gold and remaining monster number
+
+2017-12-10
+
+System
+- Now Checks save
+- Save is done every time the player won the stage
+- For Stage, there's red, blue, white (cannot access, cleared, where to go)
+
+Monster / Turret / Stage
+- Ready for multiple kinds
+- Monster have been tested
+- Turret and Stage has to be tested to make sure
+
