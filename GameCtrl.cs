@@ -17,9 +17,6 @@ public class Mon
 
 public class GameCtrl : MonoBehaviour {
 
-    public static GameCtrl control;
-
-
     [SerializeField]
     private Mon[] data;
 
@@ -49,7 +46,8 @@ public class GameCtrl : MonoBehaviour {
     private GameObject win;
     [SerializeField]
     private GameObject fail;
-    
+    [SerializeField]
+    private int curLev;
     
     //below are about summoning turret
     private Vector3 pos; //position of turret 
@@ -71,18 +69,7 @@ public class GameCtrl : MonoBehaviour {
     private int monslen;
     int layerNum = 1 << 8; //This is for turret build. Make turret to only think about terrain layer
     /*
-    void Awake()
-    {
-        if(control == null)
-        {
-            DontDestroyOnLoad(gameObject);
-            control = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
+    
     */
 
     void Start () { //Initiate
@@ -160,9 +147,14 @@ public class GameCtrl : MonoBehaviour {
         }
         if(gameEnd)
         {
-            
+
             if (winFlag)
+            {
                 win.SetActive(true);
+                if (SystemCtrl.control.progress < curLev)
+                    SystemCtrl.control.progress++;
+                SystemCtrl.control.SendMessage("save");
+            }
             else
                 fail.SetActive(true);
             Invoke("moveback",3);
