@@ -14,7 +14,7 @@ public class StageSelect : MonoBehaviour {
     void Start () {
         int check = SystemCtrl.control.progress;
 
-        for (int i=0; i<=Mathf.Min(bt.Length,check);i++)
+        for (int i=0; i<=Mathf.Min(bt.Length-1,check);i++)
         {
             int a = i;
             bt[a].onClick.AddListener(delegate { TaskOnClick(a); });
@@ -36,8 +36,11 @@ public class StageSelect : MonoBehaviour {
         SceneManager.LoadScene(a+2);
     }
 
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    void OnGUI()
+    {
+        if (GUI.Button(new Rect(10, 550, 100, 50), "Back to Main"))
+            SceneManager.LoadScene(0);
+
+        
+    }
 }

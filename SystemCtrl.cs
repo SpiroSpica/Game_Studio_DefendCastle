@@ -51,11 +51,12 @@ public class SystemCtrl : MonoBehaviour {
             progress = sav.progress;
         }
     }
-
+    /*
     public void ChangeScene(int order)
     {
         SceneManager.LoadScene(order);
     }
+    */
 }
 
 [System.Serializable]

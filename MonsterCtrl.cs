@@ -17,13 +17,13 @@ public class MonsterCtrl : MonoBehaviour {
     private int cost; //give cost money to the gameCtrl gold
     private GameObject sys; //access to gamectrl
 
-    [SerializeField]
     private GameObject castle; //access to castle
 
 	// Use this for initialization
 	void Start () {
         //castle = GameObject.FindWithTag("Castle");
         sys = GameObject.Find("Main Camera"); //to get access to GameCtrl. GameCtrl is attached to main camera object
+        castle = GameObject.FindWithTag("Castle");
         goal = castle.transform.position; //goal that monster should head to
         respawn = transform.position; //where the monster is spawned
         agent = GetComponent<NavMeshAgent>(); //set monster goal, speed

@@ -16,6 +16,7 @@ public class CastleCtrl : MonoBehaviour {
         initHP = HP;
         rigid = GetComponent<Rigidbody>();
         sys = GameObject.Find("Main Camera");
+        sys.SendMessage("changeHealth", HP);
 	}
 
     void OnTriggerEnter(Collider other) //if collided by Monster, get damage that monster has, make monster's hp to 0 to destroy it
@@ -26,6 +27,7 @@ public class CastleCtrl : MonoBehaviour {
             MonsterCtrl mc = other.gameObject.GetComponent<MonsterCtrl>();
             HP -= mc.dmg;
             mc.hp = 0;
+            sys.SendMessage("changeHealth", HP);
         }
     }
 

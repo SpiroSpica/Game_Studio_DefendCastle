@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 public class Mon
 {
     public int num;
-    public int resTime;
+    public float resTime;
     public GameObject Mons;
 };
 
@@ -26,8 +26,8 @@ public class GameCtrl : MonoBehaviour {
     private int timeMoney = 3; //period of time to gain money. If it is 3, player earns certain amount of money every 3 seconds
 
     [SerializeField]
-    private GameObject Turret; //GameObejct to build turret
-    public int cost; //cost that is needed to build turret 
+    private GameObject[] Turret; //GameObejct to build turret
+    public int[] cost; //cost that is needed to build turret 
     [SerializeField]
     private Button[] bt; //bt1 is to summon turret 1
     [SerializeField]
@@ -68,9 +68,7 @@ public class GameCtrl : MonoBehaviour {
     private int numTot; //show he total monsters left.
     private int monslen;
     int layerNum = 1 << 8; //This is for turret build. Make turret to only think about terrain layer
-    /*
-    
-    */
+    int castleHP;
 
     void Start () { //Initiate
 
@@ -85,7 +83,8 @@ public class GameCtrl : MonoBehaviour {
         StartCoroutine(GainMoney(amount, timeMoney)); //Gain ceratin amount of money at period of time
         for(int i=0; i<bt.Length;i++)
         {
-            bt[i].onClick.AddListener(delegate { TaskOnClick(i); });
+            int c = i;
+            bt[c].onClick.AddListener(delegate { TaskOnClick(c); });
         }
         txt = GameObject.Find("Canvas/Information");  //access to UI text information
         info = txt.GetComponent<Text>(); //aaccess to text itself
@@ -99,7 +98,7 @@ public class GameCtrl : MonoBehaviour {
             yield return new WaitForSeconds(timeMoney);
         }
     }
-    private IEnumerator SummonMons(int resTime, GameObject Mons, int numMons) //summon numMons of Mons by summoning a Mons every resTime
+    private IEnumerator SummonMons(float resTime, GameObject Mons, int numMons) //summon numMons of Mons by summoning a Mons every resTime
     {
         while(!gameEnd && numMons>0)
         {
@@ -118,6 +117,11 @@ public class GameCtrl : MonoBehaviour {
             numMons--;
             numTot--;
         }
+    }
+
+    public void changeHealth(int a)
+    {
+        castleHP = a;
     }
     private IEnumerator FinishCheck()  //Find Monster Objects with tag. If its number is 0, make gameEnd to true. As this function only sees gameEnd variable, if this value is changed by other function, it still works as gameEnd
     {
@@ -171,14 +175,14 @@ public class GameCtrl : MonoBehaviour {
         Debug.Log("Clicked");
        
         //If there's enough gold, summon turret
-        if (gold < cost) 
+        if (gold < cost[a]) 
             Debug.Log("You don't have enough Money");
         else
         {
-            IC = GameObject.Instantiate(Turret, newPosition, new Quaternion(0, 0, 0, 0)) as GameObject;
+            IC = GameObject.Instantiate(Turret[a], newPosition, new Quaternion(0, 0, 0, 0)) as GameObject;
             Debug.Log("Summon");
             SummonFlag = true;
-            gold -= cost;
+            gold -= cost[a];
         }
         
     }
@@ -209,10 +213,20 @@ public class GameCtrl : MonoBehaviour {
             if (this.transform.position.y <= 250)
                 this.transform.position += new Vector3(0, 1, 0);
         }
-        if (Input.GetKey("down"))
+        if (Input.GetKey("down") || Input.GetAxis("Mouse ScrollWheel") < 0f)
         {
             if (this.transform.position.y >= 150)
                 this.transform.position += new Vector3(0, -1, 0);
+        }
+        if (Input.GetAxis("Mouse ScrollWheel") > 0f)
+        {
+            if (this.transform.position.y <= 250)
+                this.transform.position += new Vector3(0, 2, 0);
+        }
+        if (Input.GetAxis("Mouse ScrollWheel") < 0f)
+        {
+            if (this.transform.position.y >= 250)
+                this.transform.position += new Vector3(0, -2, 0);
         }
     }
     void TurretSum()  //Turret summon -> if not clicked, move turret around. If clicked, set turret position
@@ -249,8 +263,12 @@ public class GameCtrl : MonoBehaviour {
 	void Update () {
         CameraMove();
         TurretSum();
-        info.text = "Gold : " + gold + "\n" + "Number of Enemies Left : " + numTot;
+        info.text = "HP : " + castleHP + "\n" + "Gold : " + gold + "\n" + "Number of Enemies Left : " + numTot;
         if(Input.GetKey("1") && SummonFlag == false)
+        {
+            TaskOnClick(0);
+        }
+        if (Input.GetKey("2") && SummonFlag == false)
         {
             TaskOnClick(1);
         }
